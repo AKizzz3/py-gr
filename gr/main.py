@@ -2,7 +2,7 @@ import os
 import subprocess
 import requests
 
-
+SCIEZKA_DO_FOLDERU = "C:\\dane_diagnostyczne"
 
 def wyslij_plik_do_webhooka(webhook_url, folder_path, file_name):
     file_path = os.path.join(folder_path, file_name)
